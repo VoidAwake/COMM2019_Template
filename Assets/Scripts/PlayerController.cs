@@ -20,6 +20,9 @@ public class PlayerController : MonoBehaviour
     private float currentHealth;
     private float score = 0f;
     private int currentKeyAmount = 0;
+    [SerializeField] private AudioSource runAudioSource;
+    [SerializeField] private AudioSource jumpAudioSource;
+    [SerializeField] private AudioSource damageAudioSource;
 
     //for live system
     public LivesSystem LS;
@@ -86,6 +89,8 @@ public class PlayerController : MonoBehaviour
             //SoundManagerScript.PlaySound("jump");       // Play jump sound
             m_Rigidbody.velocity = new Vector2(m_Rigidbody.velocity.x, jumpForce);      // Moves the player object up at a certain jump force specified by the user
             state = State.jump;     // change the state to "Jump"
+            jumpAudioSource.Play();
+            runAudioSource.Stop();
         }
 
         if (Input.GetButtonDown("Jump") && m_Collider.IsTouchingLayers(ladder))
@@ -93,6 +98,8 @@ public class PlayerController : MonoBehaviour
             //SoundManagerScript.PlaySound("jump");       // Play jump sound
             m_Rigidbody.velocity = new Vector2(m_Rigidbody.velocity.x, jumpForce);      // Moves the player object up at a certain jump force specified by the user
             state = State.jump;     // change the state to "Jump"
+            jumpAudioSource.Play();
+            runAudioSource.Stop();
         }
 
    }
@@ -119,16 +126,22 @@ public class PlayerController : MonoBehaviour
         else if(Mathf.Abs(m_Rigidbody.velocity.x) > 2f)   // Only runs when the absolute value of horizontal velocity movement is higher than 2, indicating the player is running
         {
             state = State.run;      // change the state to "Run"
+            if (!runAudioSource.isPlaying)
+                runAudioSource.Play();
         }
         else  // When nothing is happening, the player is considered "Idle"
         {
             state = State.idle;     // change the state to "Idle"
+            runAudioSource.Stop();
         }
    }
 
    // Decreases the player's health value
    public void takeDamage(float damage)
    {
+        if (!damageAudioSource.isPlaying)
+            damageAudioSource.Play();
+            
        // Decreases the player's current health by the damage value, if it is less than or equal to 0, player loses
        if ((currentHealth -= damage) <= 0)
        {
